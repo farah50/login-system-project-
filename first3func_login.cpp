@@ -30,7 +30,7 @@ struct user {
 };
 int main(){
     user info[100] ;
-//    registration();
+    registration();
     enterPassword();
 }
 void registration() {
