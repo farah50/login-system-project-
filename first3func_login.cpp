@@ -13,6 +13,8 @@
 #include<fstream>
 #include<regex>
 #include<cctype>
+#include <conio.h>
+
 using namespace std;
 
 void registration();
@@ -20,7 +22,7 @@ void enterPassword();
 
 const regex pattern(R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)");
 const regex phone("^(2)?(01){1}[0-9]{9}$");
-const regex pass("^[0-9]+[a-z_]+[A-Z]+[^0-9a-zA-z_]+$");
+const regex pass("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]})(?=.*[@$!%*?&])[A-Za-z0-9]@$!%*?&]{8,}$");
 int i = 0;
 struct user {
     string username;
@@ -30,7 +32,7 @@ struct user {
 };
 int main(){
     user info[100] ;
-    registration();
+//    registration();
     enterPassword();
 }
 void registration() {
@@ -55,19 +57,58 @@ void registration() {
 void enterPassword(){
     user info[100] = {};
     string confirm;
-    cout << "Please enter your password. \n"
-            "It must be 8 characters or more and"
-            "include letters in upper and lower cases , special characters and digits";
-    cin >> info[i].password;
+    bool upper_case = false;
+    bool lower_case = false;
+    bool number_case = false;
+    bool special_char = false;
 
-    while (!regex_match(info[i].password, pass) || info[i].password.size() < 8 ) {
-        cout << "Please enter a valid password format.\n";
-        cin >> info[i].password;
-    }
+
+    regex upper_case_expression{ "[A-Z]+" };
+    regex lower_case_expression{ "[a-z]+" };
+    regex number_expression{ "[0-9]+" }; //...
+    regex special_char_expression{ "[@!?@$#&^*:]+"};
+
+
+    string pw;
+
+
+    bool done = false;
+
+    do{
+        cout << "Please enter a valid password:"
+                     "It must be 8 characters or more and\n"
+                     "include letters in upper and lower cases , special characters and digits. \n";
+        getline(cin, info[i].password);
+       
+        if (info[i].password.length() <= 8){ //too short!
+           cout << "Invalid password! Try again\n";
+        }
+        else{
+
+            upper_case = regex_search(info[i].password, upper_case_expression);
+            lower_case = regex_search(info[i].password, lower_case_expression);
+            number_case =regex_search(info[i].password, number_expression);
+            special_char = regex_search(info[i].password, special_char_expression);
+
+            int sum_of_positive_results = upper_case + lower_case + number_case + special_char;
+
+            if (sum_of_positive_results < 3){ //not enough booleans were true!
+                cout << "Invalid password! Try again\n";
+            }
+            else{
+                cout << "That's a valid Password!" << endl;
+                done = true;
+            }
+        }
+
+    } while (!done);
     cout << "Please confirm the password you have entered. \n";
     cin >> confirm;
     while(confirm != info[i].password){
         cout << "Please confirm the password you have entered correctly.\n";
         cin >> confirm;
     }
+
 }
+
+
