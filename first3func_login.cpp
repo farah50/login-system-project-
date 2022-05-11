@@ -19,19 +19,21 @@ using namespace std;
 
 void registration();
 void enterPassword();
+string hidepw();
 
 const regex pattern(R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)");
 const regex phone("^(2)?(01){1}[0-9]{9}$");
 const regex pass("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]})(?=.*[@$!%*?&])[A-Za-z0-9]@$!%*?&]{8,}$");
 int i = 0;
+
 struct user {
     string username;
     string email;
     string password;
     string phone_num;
-};
+    long ID;
+} newUser;
 int main(){
-    user info[100] ;
 //    registration();
     enterPassword();
 }
@@ -55,7 +57,6 @@ void registration() {
 
 }
 void enterPassword(){
-    user info[100] = {};
     string confirm;
     bool upper_case = false;
     bool lower_case = false;
@@ -69,8 +70,6 @@ void enterPassword(){
     regex special_char_expression{ "[@!?@$#&^*:]+"};
 
 
-    string pw;
-
 
     bool done = false;
 
@@ -78,21 +77,22 @@ void enterPassword(){
         cout << "Please enter a valid password:"
                      "It must be 8 characters or more and\n"
                      "include letters in upper and lower cases , special characters and digits. \n";
-        getline(cin, info[i].password);
-       
-        if (info[i].password.length() <= 8){ //too short!
+        newUser.password = hidepw();
+
+
+        if (newUser.password.length() <= 8){                    //too short!
            cout << "Invalid password! Try again\n";
         }
         else{
 
-            upper_case = regex_search(info[i].password, upper_case_expression);
-            lower_case = regex_search(info[i].password, lower_case_expression);
-            number_case =regex_search(info[i].password, number_expression);
-            special_char = regex_search(info[i].password, special_char_expression);
+            upper_case = regex_search(newUser.password, upper_case_expression);
+            lower_case = regex_search(newUser.password, lower_case_expression);
+            number_case =regex_search(newUser.password, number_expression);
+            special_char = regex_search(newUser.password, special_char_expression);
 
             int sum_of_positive_results = upper_case + lower_case + number_case + special_char;
 
-            if (sum_of_positive_results < 3){ //not enough booleans were true!
+            if (sum_of_positive_results < 3){                   //not enough booleans were true!
                 cout << "Invalid password! Try again\n";
             }
             else{
@@ -104,11 +104,34 @@ void enterPassword(){
     } while (!done);
     cout << "Please confirm the password you have entered. \n";
     cin >> confirm;
-    while(confirm != info[i].password){
+    while(confirm != newUser.password){
         cout << "Please confirm the password you have entered correctly.\n";
         cin >> confirm;
     }
 
 }
+string hidepw(){
+    char ch;
+    string hidden ;
+    int s = hidden.size(), j = 0;
 
+    while(true){
+
+        ch = getch();
+        if(ch == 13){
+            cout << endl;
+            break;
+        }
+        else if(ch >= 32){
+            cout << "*";
+            hidden += " ";
+            hidden[j] = ch;
+            ++j;
+        }
+    }
+    if (hidden[s - 1] == ' '){
+        hidden.replace(hidden[s - 1] , 1 , "");
+    }
+    return hidden;
+}
 
