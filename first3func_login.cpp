@@ -31,48 +31,45 @@ struct user {
     string email;
     string password;
     string phone_num;
-    long ID;
+    string ID;
 } newUser;
 
 int main(){
-//    registration();
+    registration();
     enterPassword();
 }
 
 void registration() {
-    
-    string name, username, email, phone_num;
+
     fstream input("information.txt", ios::app);
-    
+
     cout << "Welcome \n"
             " Please enter your personal data\n" ;
 
-    cout << "Name: ";
-    cin >> name;
-    
-    cout << "User Name: ";
-    cin >> username;
-    
-    cout << "E-Mail: " ;
-    cin >> email;
 
-    while (!regex_match(email, pattern)) {
+    cout << "User Name: ";
+    cin >> newUser.username;
+
+    cout << "E-Mail: " ;
+    cin >> newUser.email;
+
+    while (!regex_match(newUser.email, pattern)) {
         cout << "Please enter a valid email format.\n";
         cout << "E-Mail: ";
-        cin >> email;
+        cin >> newUser.email;
     }
     cout << "Phone Number: ";
-    cin >> phone_num;
-    while (!regex_match(phone_num, phone)) {
+    cin >> newUser.phone_num;
+    while (!regex_match(newUser.phone_num, phone)) {
         cout << "Please enter a valid phone format.\n";
         cout << "Phone Number: ";
-        cin >> phone_num;
+        cin >> newUser.phone_num;
     }
-input << "Name: " << name << " | " << " User Name: " << username<< " | " << " E-Mail: " << email << " | " << " Phone Number: " << phone_num; 
+    input  << "User Name: " << newUser.username<< " | " << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
 }
 
 void enterPassword(){
-    
+
     fstream input("information.txt", ios::app);
     string confirm;
     bool upper_case = false;
@@ -92,14 +89,14 @@ void enterPassword(){
 
     do{
         cout << "Please enter a valid password:"
-                     "It must be 8 characters or more and\n"
-                     "include letters in upper and lower cases , special characters and digits. \n"
-                     "Password: ";
+                "It must be 8 characters or more and\n"
+                "include letters in upper and lower cases , special characters and digits. \n"
+                "Password: ";
         newUser.password = hidepw();
 
 
         if (newUser.password.length() <= 8){                    //too short!
-           cout << "Invalid password! Try again\n";
+            cout << "Invalid password! Try again\n";
         }
         else{
 
@@ -122,13 +119,13 @@ void enterPassword(){
     } while (!done);
     cout << "Please confirm the password you have entered. \n"
             "Confirm password: ";
-    cin >> confirm;
+    confirm = hidepw();
     while(confirm != newUser.password){
         cout << "Please confirm the password you have entered correctly.\n"
                 "Confirm password: ";
-        cin >> confirm;
+       confirm = hidepw();
     }
-  input  << " | " << " Password: " << newUser.password << '\n';
+    input  << " | " << " Password: " << newUser.password << '\n';
 }
 
 string hidepw(){
