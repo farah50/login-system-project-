@@ -33,30 +33,47 @@ struct user {
     string phone_num;
     long ID;
 } newUser;
+
 int main(){
 //    registration();
     enterPassword();
 }
-void registration() {
-    string name, username, email, phone_num;
 
+void registration() {
+    
+    string name, username, email, phone_num;
+    fstream input("information.txt", ios::app);
+    
     cout << "Welcome \n"
-            "Enter your email : \n" ;
+            " Please enter your personal data\n" ;
+
+    cout << "Name: ";
+    cin >> name;
+    
+    cout << "User Name: ";
+    cin >> username;
+    
+    cout << "E-Mail: " ;
     cin >> email;
 
     while (!regex_match(email, pattern)) {
         cout << "Please enter a valid email format.\n";
+        cout << "E-Mail: ";
         cin >> email;
     }
-    cout << "Enter your phone number\n";
+    cout << "Phone Number: ";
     cin >> phone_num;
     while (!regex_match(phone_num, phone)) {
         cout << "Please enter a valid phone format.\n";
+        cout << "Phone Number: ";
         cin >> phone_num;
     }
-
+input << "Name: " << name << " | " << " User Name: " << username<< " | " << " E-Mail: " << email << " | " << " Phone Number: " << phone_num; 
 }
+
 void enterPassword(){
+    
+    fstream input("information.txt", ios::app);
     string confirm;
     bool upper_case = false;
     bool lower_case = false;
@@ -76,7 +93,8 @@ void enterPassword(){
     do{
         cout << "Please enter a valid password:"
                      "It must be 8 characters or more and\n"
-                     "include letters in upper and lower cases , special characters and digits. \n";
+                     "include letters in upper and lower cases , special characters and digits. \n"
+                     "Password: ";
         newUser.password = hidepw();
 
 
@@ -102,14 +120,17 @@ void enterPassword(){
         }
 
     } while (!done);
-    cout << "Please confirm the password you have entered. \n";
+    cout << "Please confirm the password you have entered. \n"
+            "Confirm password: ";
     cin >> confirm;
     while(confirm != newUser.password){
-        cout << "Please confirm the password you have entered correctly.\n";
+        cout << "Please confirm the password you have entered correctly.\n"
+                "Confirm password: ";
         cin >> confirm;
     }
-
+  input  << " | " << " Password: " << newUser.password << '\n';
 }
+
 string hidepw(){
     char ch;
     string hidden ;
