@@ -1,11 +1,11 @@
 // FCAI – Programming 1 – 2022 - Assignment 4
-// Program Name: Text Editor.cpp
+// Program Name: Login Application Description.cpp
 // Last Modification Date: xx/xx/xxxx
 // Author1 and ID and Group: Sara Tamer Bihery - 20210155 - S25
 // Author2 and ID and Group: Farah Mohamed Mohamed El-Sayed - 20210288 - S25
 // Author3 and ID and Group: Rawnaa Mustafa  - 20210137 - S2
 // Teaching Assistant: Mahmoud Fateaha
-// Purpose: Edit an existing or new text file.
+// Purpose: To register and login
 
 
 #include<iostream>
@@ -20,11 +20,11 @@ using namespace std;
 void registration();
 void enterPassword();
 string hidepw();
+void saveInfo();
 
 const regex pattern(R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)");
 const regex phone("^(2)?(01){1}[0-9]{9}$");
 const regex pass("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]})(?=.*[@$!%*?&])[A-Za-z0-9]@$!%*?&]{8,}$");
-int i = 0;
 
 struct user {
     string username;
@@ -37,18 +37,24 @@ struct user {
 int main(){
     registration();
     enterPassword();
+    saveInfo();
 }
 
 void registration() {
 
-    fstream input("information.txt", ios::app);
 
     cout << "Welcome \n"
             " Please enter your personal data\n" ;
 
-
     cout << "User Name: ";
     cin >> newUser.username;
+
+    cout <<"ID : ";
+    cin >> newUser.ID;
+    if(newUser.ID.size() != 8){
+        cout << "Invalid ID.\n"
+                "ID: ";
+    }
 
     cout << "E-Mail: " ;
     cin >> newUser.email;
@@ -65,25 +71,21 @@ void registration() {
         cout << "Phone Number: ";
         cin >> newUser.phone_num;
     }
-    input  << "User Name: " << newUser.username<< " | " << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
+
 }
 
 void enterPassword(){
 
-    fstream input("information.txt", ios::app);
     string confirm;
     bool upper_case = false;
     bool lower_case = false;
     bool number_case = false;
     bool special_char = false;
 
-
     regex upper_case_expression{ "[A-Z]+" };
     regex lower_case_expression{ "[a-z]+" };
     regex number_expression{ "[0-9]+" }; //...
     regex special_char_expression{ "[@!?@$#&^*:]+"};
-
-
 
     bool done = false;
 
@@ -125,7 +127,6 @@ void enterPassword(){
                 "Confirm password: ";
        confirm = hidepw();
     }
-    input  << " | " << " Password: " << newUser.password << '\n';
 }
 
 string hidepw(){
@@ -152,4 +153,8 @@ string hidepw(){
     }
     return hidden;
 }
-
+void saveInfo(){
+    fstream input("information.txt", ios::app);
+    input  << "User Name: " << newUser.username<< " | " << "ID: "  << " | " << newUser.ID << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
+    input  << " | " << " Password: " << newUser.password << '\n';
+}
