@@ -66,7 +66,6 @@ void registration() {
 
     cout <<"please enter your personal data\n" 
            "User Name: ";
-    cout << "User Name: ";
     cin >> newUser.username;
 
     cout <<"ID : ";
