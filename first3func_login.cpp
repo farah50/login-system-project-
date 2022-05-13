@@ -21,6 +21,8 @@ void registration();
 void enterPassword();
 string hidepw();
 void saveInfo();
+void login();
+void changePassword();
 
 const regex pattern(R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)");
 const regex phone("^(2)?(01){1}[0-9]{9}$");
@@ -35,17 +37,35 @@ struct user {
 } newUser;
 
 int main(){
-    registration();
-    enterPassword();
-    saveInfo();
+    
+    char choice;
+    cout << " +----------------------------------------------------------+\n"
+            " +     Welcome, Please choose one option of the following   +\n"
+            " +----------------------------------------------------------+\n"
+            "1.Registration\n"
+            "2.Login\n"
+            "3.Change Password\n";
+
+    cin >> choice;        
+
+    if( choice == '1'){
+       registration();
+       enterPassword();
+       saveInfo();
+    }
+    else if( choice == '2'){
+        //login();
+    }
+    else if( choice == '3'){
+        //changePassword();
+    }
+    
 }
 
 void registration() {
 
-
-    cout << "Welcome \n"
-            " Please enter your personal data\n" ;
-
+    cout <<"please enter your personal data\n" 
+           "User Name: ";
     cout << "User Name: ";
     cin >> newUser.username;
 
@@ -155,6 +175,6 @@ string hidepw(){
 }
 void saveInfo(){
     fstream input("information.txt", ios::app);
-    input  << "User Name: " << newUser.username<< " | " << "ID: "  << " | " << newUser.ID << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
+    input  << "User Name: " << newUser.username<< " | " << "ID: " << newUser.ID << " | " << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
     input  << " | " << " Password: " << newUser.password << '\n';
 }
