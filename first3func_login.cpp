@@ -23,6 +23,8 @@ string hidepw();
 void saveInfo();
 void login();
 void changePassword();
+bool searchForID(string& word);
+bool searchForEmail(string& mail);
 
 const regex pattern(R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)");
 const regex phone("^(2)?(01){1}[0-9]{9}$");
@@ -37,7 +39,7 @@ struct user {
 } newUser;
 
 int main(){
-    
+
     char choice;
     cout << " +----------------------------------------------------------+\n"
             " +     Welcome, Please choose one option of the following   +\n"
@@ -46,12 +48,13 @@ int main(){
             "2.Login\n"
             "3.Change Password\n";
 
-    cin >> choice;        
+    cin >> choice;
 
     if( choice == '1'){
        registration();
        enterPassword();
        saveInfo();
+       cout << "Successful registration! \n";
     }
     else if( choice == '2'){
         //login();
@@ -59,20 +62,31 @@ int main(){
     else if( choice == '3'){
         //changePassword();
     }
-    
+
 }
 
 void registration() {
 
-    cout <<"please enter your personal data\n" 
+    cout <<"please enter your personal data\n"
            "User Name: ";
     cin >> newUser.username;
 
     cout <<"ID : ";
     cin >> newUser.ID;
-    if(newUser.ID.size() != 8){
+    while(newUser.ID.size() != 8){
         cout << "Invalid ID.\n"
                 "ID: ";
+        cin >> newUser.ID;
+    }
+    bool i = true;
+    while (i){
+        if (searchForID(newUser.ID)) {
+            i = false;
+        } else {
+            cout << "Invalid ID.\n"
+                    "ID: ";
+            cin >> newUser.ID;
+        }
     }
 
     cout << "E-Mail: " ;
@@ -82,6 +96,16 @@ void registration() {
         cout << "Please enter a valid email format.\n";
         cout << "E-Mail: ";
         cin >> newUser.email;
+    }
+    i = true;
+    while(i){
+        if(searchForEmail(newUser.email)){
+            i = false;
+        }else{
+            cout << "Invalid Email!"
+                    "E-mail: ";
+            cin >> newUser.email;
+        }
     }
     cout << "Phone Number: ";
     cin >> newUser.phone_num;
@@ -176,4 +200,65 @@ void saveInfo(){
     fstream input("information.txt", ios::app);
     input  << "User Name: " << newUser.username<< " | " << "ID: " << newUser.ID << " | " << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
     input  << " | " << " Password: " << newUser.password << '\n';
+}
+bool searchForID(string& word) {
+    char text[1000];
+    vector<string> lines;
+//    int i = 0;
+//    while (i < word.size()) {
+//        word[i] = tolower(word[i]);
+//        i++;
+//    }
+    fstream InfoFile;
+    InfoFile.open("information.txt", fstream::in | fstream::out);
+    while (!InfoFile.eof()) {
+        InfoFile.getline(text, 1000, '\n');
+        lines.push_back(string(text));
+    }
+    InfoFile.close();
+
+//    for (int i = 0; i < lines.size(); i++) {
+//        for (int j = 0; j < lines[i].size(); j++) {
+//            lines[i][j] = tolower(lines[i][j]);
+//            cout << lines[i][j];
+//        }
+//    }
+    bool k = true;
+    for (int i = 0; i < lines.size(); i++) {
+        if (lines[i].find(word) != string::npos) {
+            k = false;
+            break;
+        }
+    }
+    return k;
+}
+bool searchForEmail(string& mail){
+    char text[1000];
+    vector<string> lines;
+    int i = 0;
+    while (i < mail.size()) {
+        mail[i] = tolower(mail[i]);
+        i++;
+    }
+    fstream InfoFile;
+    InfoFile.open("information.txt", fstream::in | fstream::out);
+    while (!InfoFile.eof()) {
+        InfoFile.getline(text, 1000, '\n');
+        lines.push_back(string(text));
+    }
+    InfoFile.close();
+
+    for (int i = 0; i < lines.size(); i++) {
+        for (int j = 0; j < lines[i].size(); j++) {
+            lines[i][j] = tolower(lines[i][j]);
+        }
+    }
+    bool k = true;
+    for (int i = 0; i < lines.size(); i++) {
+        if (lines[i].find(mail) != string::npos) {
+            k = false;
+            break;
+        }
+    }
+    return k;
 }
