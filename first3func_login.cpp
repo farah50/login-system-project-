@@ -57,7 +57,7 @@ int main(){
        cout << "Successful registration! \n";
     }
     else if( choice == '2'){
-        //login();
+        login();
     }
     else if( choice == '3'){
         //changePassword();
@@ -261,4 +261,39 @@ bool searchForEmail(string& mail){
         }
     }
     return k;
+}
+
+void login(){
+
+    int CountLogin = 3;
+
+    while( CountLogin > 0){
+
+    cout << "ID: ";
+    cin >> newUser.ID;
+
+    cout << "Password: ";
+    newUser.password = hidepw();
+
+       //to cheack if the id or password are not found.
+        if (searchForID(newUser.ID) && searchForID(newUser.password)) {  
+            cout << "Invalid user name and password, please try again \n";
+            CountLogin--;
+        }
+        else if(searchForID(newUser.ID) || searchForID(newUser.password)){
+            cout << "Invalid user name or password, please try again \n";
+            CountLogin--;
+        }
+        else if(searchForID(newUser.password) ||searchForID(newUser.ID)){
+            cout << "Invalid user name or password";
+            CountLogin--;
+        }  
+       //if the user name and password are found    
+        else {          
+            cout << "Successful login.\n";  
+             break; 
+        }
+
+    }
+  
 }
