@@ -1,394 +1,380 @@
-#include <fstream>
-#include <iostream>
-#include <vector>
-#include "MyHeaderFile.h"
+// FCAI – Programming 1 – 2022 - Assignment 4
+// Program Name: Login Application Description.cpp
+// Last Modification Date: xx/xx/xxxx
+// Author1 and ID and Group: Sara Tamer Bihery - 20210155 - S25
+// Author2 and ID and Group: Farah Mohamed Mohamed El-Sayed - 20210288 - S25
+// Author3 and ID and Group: Rawnaa Mustafa  - 20210137 - S2
+// Teaching Assistant: Mahmoud Fateaha
+// Purpose: To register and login
+
+
+#include<iostream>
+#include<string.h>
+#include<fstream>
+#include<regex>
+#include<cctype>
+#include <conio.h>
+#include <sstream>
+#include <iomanip>
+#include <stdlib.h>
 
 using namespace std;
 
-int choice;
-fstream myFile;
-fstream myFile2;
-fstream targetFile;
-vector<string> lines;
-vector<string> lines2;
-vector<string> wordvector;
-vector<char> inside;
-char text[100] , text2[100], name[100], text0 , name2[100];
-string readWord, userWord, targetFileName , name_file;
+void registration();
+void enterPassword();
+string hidepw();
+void saveInfo();
+void login();
+void changePassword();
+bool searchForID(string& word);
+bool searchForEmail(string& mail);
+void changePW();
 
+const regex pattern(R"((\w+)(\.|_)?(\w*)@(\w+)(\.(\w+))+)");
+const regex phone("^(2)?(01){1}[0-9]{9}$");
+const regex pass("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]})(?=.*[@$!%*?&])[A-Za-z0-9]@$!%*?&]{8,}$");
 
-//function that display the menu to the user
-int menuDisplay() {
+struct user {
+    string username;
+    string email;
+    string password;
+    string encr_Hex = "";
+    string phone_num;
+    string ID;
+} newUser;
 
-    cout << "\n Please choose one option of the following: \n"
-            "1. Add new text to the end of the file \n"
-            "2. Display the content of the file\n"
-            "3. Empty the file\n"
-            "4. Encrypt the file content \n"
-            "5. Decrypt the file content\n"
-            "6. Merge another file\n"
-            "7. Count the number of words in the file.\n"
-            "8. Count the number of characters in the file\n"
-            "9. Count the number of lines in the file\n"
-            "10. Search for a word in the file\n"
-            "11. Count the number of times a word exists in the file\n"
-            "12. Turn the file content to upper case.\n"
-            "13. Turn the file content to lower case.\n"
-            "14. Turn file content to 1st caps (1st char of each word is capital) \n"
-            "15. Save\n"
-            "16. Exit\n";
+int main(){
+
+    char choice;
+    cout << " +----------------------------------------------------------+\n"
+            " +     Welcome, Please choose one option of the following   +\n"
+            " +----------------------------------------------------------+\n"
+            "1.Registration\n"
+            "2.Login\n"
+            "3.Change Password\n"
+            "4.Exit \n";
+
     cin >> choice;
-    return choice;
-}
-//function that load the file into vector and array of characters
-void loadFile(vector<string>& lines,fstream& myFile){
-    cout << "Please enter the file name : \n";
-    cin >> name;
-    myFile.open(name , fstream::in | fstream::out);
 
-    if (myFile){
-        cout << "The file has opened successfully \n";
-        while (!myFile.eof()){
-            myFile.getline(text , 100 , '\n');
-            lines.push_back(string(text));
-        }
+    if( choice == '1'){
+       registration();
+       enterPassword();
+       saveInfo();
+       cout << "Successful registration! \n";
     }
-    else {
-        cout << "This file couldn't open.\n "
-                "Another file will be created when saving \n";
+    else if( choice == '2'){
+        login();
     }
-}
-//function to load the second file in case of merge or some other cases
-void loadFile2(vector<string>& lines2,fstream& myFile2){
-    cout << "Please enter the name of the other file : \n";
-    cin >> name2;
-    myFile2.open(name2 , fstream::in | fstream::out);
+    else if( choice == '3'){
+       changePW();
+    }
+    else if( choice == '4'){
+        cout << "Good bye ^-^";
+    }
 
-    if (myFile2){
-        cout << "The file has opened successfully \n";
-        while (!myFile2.eof()){
-            myFile2.getline(text2 , 100 , '\n');
-            lines2.push_back(string(text2));
+}
+
+void registration() {
+
+    cout <<"please enter your personal data\n"
+           "User Name: ";
+    cin >> newUser.username;
+
+    cout <<"ID : ";
+    cin >> newUser.ID;
+    while(newUser.ID.size() != 8){
+        cout << "Invalid ID.\n"
+                "ID: ";
+        cin >> newUser.ID;
+    }
+    bool i = true;
+    while (i){
+        if (searchForID(newUser.ID)) {
+            i = false;
+        } else {
+            cout << "Invalid ID.\n"
+                    "ID: ";
+            cin >> newUser.ID;
         }
     }
-    else {
-        cout << "This file couldn't open.\n "
-                "Another file will be created when saving \n";
+
+    cout << "E-Mail: " ;
+    cin >> newUser.email;
+
+    while (!regex_match(newUser.email, pattern)) {
+        cout << "Please enter a valid email format.\n";
+        cout << "E-Mail: ";
+        cin >> newUser.email;
     }
-}
-//function to count the characters inside the file
-void countChar(){
-    long counter = 0 ;
-    for(int i = 0 ; i < lines.size(); i ++){            //loop on each vector of strings and access the characters and count it
-        for(int j = 0 ; j < lines[i].size() ; j++){
-            counter ++;
+    i = true;
+    while(i){
+        if(searchForEmail(newUser.email)){
+            i = false;
+        }else{
+            cout << "Invalid Email!"
+                    "E-mail: ";
+            cin >> newUser.email;
         }
     }
-    cout << "The number of characters in the file = " << counter << endl;
+    cout << "Phone Number: ";
+    cin >> newUser.phone_num;
+    while (!regex_match(newUser.phone_num, phone)) {
+        cout << "Please enter a valid phone format.\n";
+        cout << "Phone Number: ";
+        cin >> newUser.phone_num;
+    }
+
 }
-//function to count the words inside the file
-void countWords(){
-    long counter = 0 ;
-    for(int i = 0 ; i < lines.size(); i ++){            //loop on the vector of strings and access the words and count it
-        for(int j = 0 ; j < lines[i].size() ; j++){
-            if(lines[i][j] == ' '){
-                counter ++;
+
+void enterPassword(){
+
+    stringstream res;
+    string keyword, confirm;
+    bool upper_case = false;
+    bool lower_case = false;
+    bool number_case = false;
+    bool special_char = false;
+
+    regex upper_case_expression{ "[A-Z]+" };
+    regex lower_case_expression{ "[a-z]+" };
+    regex number_expression{ "[0-9]+" }; //...
+    regex special_char_expression{ "[@!?@$#&^*:]+"};
+
+    int keyItr = 1;
+    bool done = false;
+
+    do{
+        cout << "Please enter a valid password:"
+                "It must be 8 characters or more and\n"
+                "include letters in upper and lower cases , special characters and digits. \n"
+                "Password: ";
+        newUser.password = hidepw();
+
+         for (int i = 0; i < newUser.password.length(); i++){
+
+            int temp = newUser.password[i] ^ keyword[keyItr];
+            res << hex << setfill('0') << std::setw(2) << (int)temp;
+            keyItr++;
+
+            if (keyItr >= keyword.length()){
+            keyItr = 0;
+            }
+         }
+            res >> newUser.encr_Hex;
+
+
+        if (newUser.password.length() <= 8){                    //too short!
+            cout << "Invalid password! Try again\n";
+        }
+        else{
+
+            upper_case = regex_search(newUser.password, upper_case_expression);
+            lower_case = regex_search(newUser.password, lower_case_expression);
+            number_case =regex_search(newUser.password, number_expression);
+            special_char = regex_search(newUser.password, special_char_expression);
+
+            int sum_of_positive_results = upper_case + lower_case + number_case + special_char;
+
+            if (sum_of_positive_results < 3){                   //not enough booleans were true!
+                cout << "Invalid password! Try again\n";
+            }
+            else{
+                cout << "That's a valid Password!" << endl;
+                done = true;
             }
         }
-        counter ++;
+
+    } while (!done);
+    cout << "Please confirm the password you have entered. \n"
+            "Confirm password: ";
+    confirm = hidepw();
+    while(confirm != newUser.password){
+        cout << "Please confirm the password you have entered correctly.\n"
+                "Confirm password: ";
+       confirm = hidepw();
     }
-    cout << "The number of words in the file = " << counter  << endl;
 }
-//function to merge two files in  the first file
-void mergeFile(){
-//    close the files after loading it
-    myFile2.close();
-    myFile.close();
-    myFile.open(name , ios::app);                           //open the 1st file in the append mode
-    myFile2.open(name2 ,  fstream::in | fstream::out );     //open the 2nd file in the in mode
-    myFile << "\n";
-    while(!myFile2.eof()) {                         //loop on the second file and append its content into the first one
-        myFile2 >> text2;
-        myFile << " ";
-        myFile << text2;
-    }
-    myFile.close();
-    myFile2.close();
-    cout << "The files merged successfully.\n" ;
-}
-//function to search for word and check its existence in the file
-void searchForWord() {
-    string word ;
-    cout << "Please enter the word you want to search for. \n";
-    cin >> word;                                                    // get the word the user want to check
-    //convert the word to the lower case
-    int i = 0;
-    while(i < word.size()){
-        word[i] = tolower(word[i]);
-        i ++;
-    }
-//    close the file then open it in the mode of in
-    myFile.close();
-    myFile.open(name , fstream::in | fstream::out);
-    while (!myFile.eof()){
-        myFile.getline(text , 100 , '\n');
-        lines.push_back(string(text));
-    }
-//    convert the text of the file into the lower case before checking
-    for(int i = 0 ; i < lines.size(); i ++) {
-        for (int j = 0; j < lines[i].size(); j++) {
-            lines[i][j] = tolower(lines[i][j]);
+
+string hidepw(){
+    char ch;
+    string hidden ;
+    int s = hidden.size(), j = 0;
+
+    while(true){
+
+        ch = getch();
+        if(ch == 13){
+            cout << endl;
+            break;
+        }
+        else if(ch >= 32){
+            cout << "*";
+            hidden += " ";
+            hidden[j] = ch;
+            ++j;
         }
     }
-//    check the presence of the word inside the file
+    if (hidden[s - 1] == ' '){
+        hidden.replace(hidden[s - 1] , 1 , "");
+    }
+    return hidden;
+}
+void saveInfo(){
+    fstream input("information.txt", ios::app);
+    input  << "User Name: " << newUser.username<< " | " << "ID: " << newUser.ID << " | " << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
+    input  << " | " << " Password: " << newUser.encr_Hex << "\n";
+}
+bool searchForID(string& word) {
+    char text[1000];
+    vector<string> lines;
+
+    fstream InfoFile;
+    InfoFile.open("information.txt", fstream::in | fstream::out);
+    while (!InfoFile.eof()) {
+        InfoFile.getline(text, 1000, '\n');
+        lines.push_back(string(text));
+    }
+    InfoFile.close();
+
     bool k = true;
-    for(int i = 0 ; i < lines.size(); i ++) {
+    for (int i = 0; i < lines.size(); i++) {
         if (lines[i].find(word) != string::npos) {
-            cout << "Word was found in the file. \n";
             k = false;
             break;
         }
     }
-    if(k){
-        cout << "Word was not found in the file. \n";
-    }
+    return k;
 }
-//function to change the file content into the upper case
-void TurnToUpper(){
+bool searchForEmail(string& mail){
+    char text[1000];
+    vector<string> lines;
+    int i = 0;
+    while (i < mail.size()) {
+        mail[i] = tolower(mail[i]);
+        i++;
+    }
+    fstream InfoFile;
+    InfoFile.open("information.txt", fstream::in | fstream::out);
+    while (!InfoFile.eof()) {
+        InfoFile.getline(text, 1000, '\n');
+        lines.push_back(string(text));
+    }
+    InfoFile.close();
 
+    for (int i = 0; i < lines.size(); i++) {
+        for (int j = 0; j < lines[i].size(); j++) {
+            lines[i][j] = tolower(lines[i][j]);
+        }
+    }
+    bool k = true;
+    for (int i = 0; i < lines.size(); i++) {
+        if (lines[i].find(mail) != string::npos) {
+            k = false;
+            break;
+        }
+    }
+    return k;
+}
 
-    cout << "Please enter the file name : ";
-    cin >> name;
+void login(){
 
-    cout << "Please enter the target file name: ";
-    cin >> targetFileName;
+    stringstream res;
+    string confirm, keyword;
+    int keyItr = 1;
+    int CountLogin = 3;
 
-    myFile.open(name,ios::in);
-    targetFile.open(targetFileName, ios::out);
+    while( CountLogin > 0){
 
-    if(myFile){
-        while(myFile.get(text0)){                   //loop on the file and change the characters into the upper case
+    cout << "ID: ";
+    cin >> newUser.ID;
 
-            inside.push_back(toupper(text0));
-
-            for(int i=0 ; i<inside.size()-1 ; ++i){
-                targetFile.put(inside[i]);
+    cout << "Password: ";
+    newUser.password = hidepw();
+    for (int i = 0; i < newUser.password.length(); i++){
+            int temp = newUser.password[i] ^ keyword[keyItr];
+            res << hex << setfill('0') << std::setw(2) << (int)temp;
+            keyItr++;
+            if (keyItr >= keyword.length()){
+            keyItr = 0;
             }
         }
-        myFile.close();
-        targetFile.close();
-        cout << "The file turned to uppercase successfully\n";
-    }
-    else{
-        cout << " Can't open file.";
-    }
 
-}
-//function to change the file content into the lower case
-void TurnToLower(){
-
-    cout << "Please enter the file name : ";
-    cin >> name;
-
-    cout << "Please enter the target file name: ";
-    cin >> targetFileName;
-
-    myFile.open(name,ios::in);
-    targetFile.open(targetFileName, ios::out);
-
-    if(myFile){
-        while(myFile.get(text0)){                       //loop on the file characters and change it into lower case
-
-            inside.push_back(toupper(text0));
-
-            for(int i=0 ; i < inside.size()-1 ; ++i){
-                targetFile.put(inside[i]);
-            }
+       //to check if the ID or password are not found.
+        if (searchForID(newUser.ID) && searchForID(newUser.encr_Hex)) {
+            cout << "Invalid user name and password, please try again \n";
+            CountLogin--;
         }
-        myFile.close();
-        targetFile.close();
-        cout << "The file turned to uppercase successfully\n";
-    }
-    else{
-        cout << " Can't open file.";
-    }
-
-}
-//function to search for word and count the number of times it repeated into the file
-void FreqWord(){
-
-    cout << "Please enter the file name : ";
-    cin >> name;                                    // get the file name from the user
-
-    myFile.open(name,ios::in);
-
-    while(myFile >> readWord){
-
-        wordvector.push_back(readWord);                //load the file content
-    }
-
-    while(true){                                    //infinite loop to count the word repetition
-
-        int counter = 0;
-
-        cout <<"Please enter the word you want to check occurrences of: ";
-        cin >> userWord;                            //get the word the user want count its frequency
-
-        for(int i = 0; i < wordvector.size(); i++){
-
-            if( userWord == wordvector[i]){
-                counter++;
-            }
-
+        else if(searchForID(newUser.ID) || searchForID(newUser.encr_Hex)){
+            cout << "Invalid user name or password, please try again \n";
+            CountLogin--;
         }
-        cout <<"The word " << userWord << " was found: " << counter << " times" << endl;
-        break;
-    }
-}
-//function to change the first character of each word into upper case
-void firstUpper(){
-
-    bool newSentence = true;
-
-    cout << "Please enter the file name: " ;
-    cin >> name;
-
-    cout << "Please enter the target file name: " ;
-    cin >> targetFileName;
-
-    targetFile.open(targetFileName, ios::out);
-    myFile.open(name, ios::in);
-
-    if (myFile) {
-        while (myFile.get(text0)) {
-            if (text0 == ' ') {        // To check if there is a space or not
-                newSentence = true;
-            }
-            if (isalpha(text0)) {
-                if (newSentence) {
-                    text0 = toupper(text0);
-                    newSentence = false;   //To make the other letter of the word lowercase
-                }
-                else {
-                    text0= tolower(text0);
-                }
-            }
-            targetFile.put(text0);
+        else if(searchForID(newUser.encr_Hex) ||searchForID(newUser.ID)){
+            cout << "Invalid user name or password";
+            CountLogin--;
+            cout << " your denied access to the system";
         }
-        myFile.close();
-        targetFile.close();
+       //if the username and password are found
+        else {
+            cout << "Successful login.\n";
+            break;
+        }
     }
-    else {
-        cout << "Cannot open file(s)." << endl;
-    }
-
-    cout << "\nFile conversion successfully." << endl;
 
 }
-//function to add text to the file
-void add_text (){
-    string name_file;
-    cout << "enter the name of file you want to add text to: \n";
-    cin >> name_file;
+void changePW(){
+    stringstream res;
+    int keyItr = 1;
+    string keyword;
+    char text[1000];
+    vector<string> lines;
+    string oldP, newPW_encr;
+    login();
 
-    fstream myFile(name_file.c_str(), ios::app);    // open the file in the mood of append
-
-    string line;
-    cout << "Enter the text you want to add. \n";
-    cin.get();
-    getline(cin, line);                             // get the text the user want to append
-
-    if (!cin.eof()) {
-        myFile << line << '\n';                             //add the text to the file
-    }
-
-    myFile.close();
-
-    cin.clear();
-}
-//function to empty the file
-void empty_file(string& name_file) {
-
-    fstream myFile(name_file.c_str(), ios::out);
-
-    myFile.close();
-
-}
-//function to display or print the file content
-void displayContent() {
-    string name_file;
-    cout << "enter the name of file you want to display: \n";
-    cin >> name_file;
-
-    fstream file(name_file.c_str(), ios::in);
-
-    char str[10000];
-
-    while (file.getline(str, 10000)) {
-        cout << str << endl;
-    }
-    file.close();
-
-}
-//function to encrypt the file content
-void encryption() {
-    cout<<"enter the name of file you want to encrypt. \n";
-    cin >> name_file;
-    fstream myFile(name_file, ios::in );
-    string file_content = "";
-    string encrypt="";
-    char line[1000];
-
-    while (myFile.getline(line, 1000, '\n')) {
-        file_content += line ;                              //load the file into string
-        file_content += '\n';
-    }
-    myFile.close();
-    myFile.open(name_file,  ios::out);              //empty the file
-    char c;
-    for (int i = 0 ; i < file_content.size(); i++){
-        if(file_content[i] == '\n'){                        //keep the new lines in its position
-            c = '\n';
-            encrypt +=c;
+    cout <<"The old password:  ";
+    cin >> oldP;
+    hidepw();
+    while(true){
+        if(oldP == newUser.password){
+            enterPassword();
+            break;
         }
         else{
-            c = file_content[i] + 1;              //encrypt the characters by changing them to the following char in ASCII
-            encrypt +=c;
+            cout << "Wrong old password! \n"
+                    "Old Password : ";
+                cin >> oldP;
+                hidepw();
         }
     }
-    myFile << encrypt;                          //put the encrypted string into the file
-    myFile.close();
+    newPW_encr = newUser.encr_Hex;
+    for (int i = 0; i < oldP.length(); i++){
+
+        int temp = oldP[i] ^ keyword[keyItr];
+        res << hex << setfill('0') << std::setw(2) << (int)temp;
+        keyItr++;
+
+        if (keyItr >= keyword.length()){
+            keyItr = 0;
+        }
+    }
+    res >> newUser.encr_Hex;
+
+    fstream InfoFile;
+    InfoFile.open("information.txt", fstream::in | fstream::out);
+    while (!InfoFile.eof()) {
+        InfoFile.getline(text, 1000, '\n');
+        lines.push_back(string(text));
+    }
+
+    InfoFile.close();
+    InfoFile.open("information.txt", fstream::out);
+    InfoFile.close();
+    InfoFile.open("information.txt", fstream::app);
+    for (int i = 0; i < lines.size(); i++){
+        if (lines[i] == newUser.encr_Hex){
+            lines[i] = newPW_encr;
+        }
+        InfoFile << lines[i];
+    }
+    InfoFile.close();
+    cout << newPW_encr<< endl << newUser.encr_Hex;
 }
-//function to decrypt the file content
-void decryption(){
-    string name_file;
-    cout<<"enter the name of file you want to decrypt\n";
-    cin >> name_file;
-    fstream myFile(name_file, ios::in );
-    string file_content = "";
-    string decrypt="";
-    char line[1000];
-
-    while (myFile.getline(line, 1000, '\n')) {
-        file_content += line ;                              //load the file content into string
-        file_content += '\n';
-    }
-    myFile.close();
-    myFile.open(name_file,  ios::out);              // empty the file
-
-    char c;
-    for (int i = 0 ; i < file_content.size(); i++){
-        if(file_content[i] == '\n'){                        // keep the new lines in its position
-            c = '\n';
-            decrypt += c;
-
-        }
-        else{
-            c = file_content[i] - 1;                  //decrypt the characters by return them to the previous char in ASCII
-            decrypt += c;
-        }
-    }
-    myFile << decrypt;                              //put the decrypted content in the file
-    myFile.close();
-}
-
