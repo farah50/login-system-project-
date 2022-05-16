@@ -14,6 +14,9 @@
 #include<regex>
 #include<cctype>
 #include <conio.h>
+#include <sstream>
+#include <iomanip>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -34,6 +37,7 @@ struct user {
     string username;
     string email;
     string password;
+    string encr_Hex = "";
     string phone_num;
     string ID;
 } newUser;
@@ -46,7 +50,8 @@ int main(){
             " +----------------------------------------------------------+\n"
             "1.Registration\n"
             "2.Login\n"
-            "3.Change Password\n";
+            "3.Change Password\n"
+            "4.Exit";
 
     cin >> choice;
 
@@ -61,6 +66,9 @@ int main(){
     }
     else if( choice == '3'){
         //changePassword();
+    }
+    else if( choice == '4'){
+        cout << "Good bye ^-^";
     }
 
 }
@@ -129,7 +137,8 @@ void enterPassword(){
     regex lower_case_expression{ "[a-z]+" };
     regex number_expression{ "[0-9]+" }; //...
     regex special_char_expression{ "[@!?@$#&^*:]+"};
-
+    
+    int keyItr = 1;
     bool done = false;
 
     do{
@@ -138,6 +147,18 @@ void enterPassword(){
                 "include letters in upper and lower cases , special characters and digits. \n"
                 "Password: ";
         newUser.password = hidepw();
+        
+         for (int i = 0; i < newUser.password.length(); i++){
+             
+            int temp = newUser.password[i] ^ keyword[keyItr];
+            res << hex << setfill('0') << std::setw(2) << (int)temp;
+            keyItr++;
+             
+            if (keyItr >= keyword.length()){
+            keyItr = 0;
+            }
+         }
+            res >> newUser.encr_Hex;
 
 
         if (newUser.password.length() <= 8){                    //too short!
@@ -199,7 +220,7 @@ string hidepw(){
 void saveInfo(){
     fstream input("information.txt", ios::app);
     input  << "User Name: " << newUser.username<< " | " << "ID: " << newUser.ID << " | " << " E-Mail: " << newUser.email << " | " << " Phone Number: " << newUser.phone_num;
-    input  << " | " << " Password: " << newUser.password << '\n';
+    input  << " | " << " Password: " << newUser.encr_Hex << "\n";
 }
 bool searchForID(string& word) {
     char text[1000];
@@ -265,6 +286,9 @@ bool searchForEmail(string& mail){
 
 void login(){
 
+    stringstream res;
+    string confirm, keyword;
+    int keyItr = 1;
     int CountLogin = 3;
 
     while( CountLogin > 0){
@@ -274,26 +298,34 @@ void login(){
 
     cout << "Password: ";
     newUser.password = hidepw();
-
+    for (int i = 0; i < newUser.password.length(); i++){
+            int temp = newUser.password[i] ^ keyword[keyItr];
+            res << hex << setfill('0') << std::setw(2) << (int)temp;
+            keyItr++;
+            if (keyItr >= keyword.length()){
+            keyItr = 0;
+            }
+        }
+    
        //to cheack if the id or password are not found.
-        if (searchForID(newUser.ID) && searchForID(newUser.password)) {  
+        if (searchForID(newUser.ID) && searchForID(newUser.encr_Hex)) {  
             cout << "Invalid user name and password, please try again \n";
             CountLogin--;
         }
-        else if(searchForID(newUser.ID) || searchForID(newUser.password)){
+        else if(searchForID(newUser.ID) || searchForID(newUser.encr_Hex)){
             cout << "Invalid user name or password, please try again \n";
             CountLogin--;
         }
-        else if(searchForID(newUser.password) ||searchForID(newUser.ID)){
+        else if(searchForID(newUser.encr_Hex) ||searchForID(newUser.ID)){
             cout << "Invalid user name or password";
             CountLogin--;
+            cout << " your denied accses to the system";
         }  
        //if the user name and password are found    
         else {          
             cout << "Successful login.\n";  
-             break; 
+            break; 
         }
-
     }
   
 }
