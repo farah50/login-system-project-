@@ -222,28 +222,28 @@ bool searchForEmail(string& mail){
 // function to login to the app after register
 void login(){
 
-    stringstream res;
+    stringstream res ,line, name ;
     string confirm, keyword;
     int keyItr = 1;
     int CountLogin = 3;
 
-    while( CountLogin > 0){         // give the user 3 trials to enter his information correctly
+    while( CountLogin > 0){
 
         cout << "ID: ";
-        cin >> newUser.ID;          // login using ID and password
+        cin >> newUser.ID;
 
         cout << "Password: ";
-        newUser.password = hidepw();                //hide password with **
-        for (int i = 0; i < newUser.password.length(); i++){        //encrypt the password
+        newUser.password = hidepw();
+        for (int i = 0; i < newUser.password.length(); i++){
             int temp = newUser.password[i] ^ keyword[keyItr];
-            res << hex << setfill('0') << setw(2) << (int)temp;
+            res << hex << setfill('0') << std::setw(2) << (int)temp;
             keyItr++;
             if (keyItr >= keyword.length()){
                 keyItr = 0;
             }
         }
 
-        //to check if the ID or password are not found.
+        //to cheack if the id or password are not found.
         if (searchForID(newUser.ID) && searchForID(newUser.encr_Hex)) {
             cout << "Invalid user name and password, please try again \n";
             CountLogin--;
@@ -255,16 +255,39 @@ void login(){
         else if(searchForID(newUser.encr_Hex) ||searchForID(newUser.ID)){
             cout << "Invalid user name or password";
             CountLogin--;
-            cout << " your denied access to the system";
+            cout << " your denied accses to the system";
         }
-            //if the username and password are found
+            //if the user name and password are found
         else {
-            cout << "Successful login.\n";
+            ifstream myfile("information.txt");
+
+//            myfile.open("information.txt", ios::in | ios::out );
+
+            while(!myfile.fail() && !myfile.eof()){
+                if(!myfile.eof()){
+                    while(getline(myfile,line)){
+                        int found = 0;
+                        if(line.find(newUser.ID ) !=  string::npos){
+
+                            if(line.find("User Name: ") !=  string::npos ){
+                                found = line.find("User Name: ") + 11;
+
+                                while(line[found] != ' '){
+                                    name += line[found];
+                                    found ++;
+                                }
+                                cout << "Successful login, welcome " << name;
+                            }
+                        }
+
+                    }
+                }
+            }
             break;
         }
     }
-
 }
+
 // Function to change password
 void changePW(){
     stringstream res;
