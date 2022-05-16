@@ -126,8 +126,9 @@ void registration() {
 }
 
 void enterPassword(){
-
-    string confirm;
+    
+    stringstream res;
+    string keyword, confirm;
     bool upper_case = false;
     bool lower_case = false;
     bool number_case = false;
